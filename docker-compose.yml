@@ -1,0 +1,24 @@
+services:
+  db:
+    image: postgres:latest
+    container_name: chat-db
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: chatdb
+    ports:
+      - "5432:5432"
+    restart: always
+
+  server:
+    build: .
+    container_name: chat-server
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: "postgres://user:password@db/chatdb?sslmode=disable"
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+    restart: always
+    entrypoint: ["sh", "-c", "test -f .env || cp env.example .env && ./chat-server"]
